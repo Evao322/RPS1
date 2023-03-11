@@ -1,251 +1,179 @@
-package ver2;
+package application;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import java.util.Random;
 
-public class Main extends Application {
-    private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 600;
-    private static final int GAME_PANE_WIDTH = 400;
-    private static final int GAME_PANE_HEIGHT = 300;
+public class FirstComeFirstWin extends Application {
+	Scene startScene, gameScene, endScene;
+    private int playerScore = 0;
+    private int computerScore = 0;
+    private int roundsToWin = 1; //for testing roundsToWin = 1;
 
-    private Stage primaryStage;
-    private Scene startScene, gameScene, endScene;
-    private int playerScore, computerScore, maxScore;
-
-    private ImageView playerChoiceImageView, computerChoiceImageView;
-    private Label playerScoreLabel, computerScoreLabel, messageLabel;
-
-    private final Random random = new Random();
-    private final String[] choices = {"Rock", "Paper", "Scissors"};
 
     @Override
-    public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        primaryStage.setTitle("Rock Paper Scissors Game");
-
-       
-
-        // create start scene
-        VBox startPane = new VBox(20);
-        startPane.setAlignment(Pos.CENTER);
-        Label titleLabel = new Label("Rock Paper Scissors Game");
-        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 36));
-        Label maxScoreLabel = new Label("Winning Score (1-10):");
-        maxScoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        TextField maxScoreTextField = new TextField("5");
-        maxScoreTextField.setMaxWidth(50);
-        Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> {
-            maxScore = Integer.parseInt(maxScoreTextField.getText());
-            playerScore = 0;
-            computerScore = 0;
-            updateGameScene();
-            primaryStage.setScene(gameScene);
-        });
-        startPane.getChildren().addAll(titleLabel, maxScoreLabel, maxScoreTextField, startButton);
-        startScene = new Scene(startPane, WINDOW_WIDTH, WINDOW_HEIGHT);
+    public void start(Stage primaryStage) throws Exception {
+    	
+    	//gameScene
+        Label titleLable = new Label("First Come First Win");
+        titleLable.setTextFill(Color.web("#6189D0"));
+        titleLable.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,25));
+        Label playerScoreLable = new Label("Player Score: 0");
+        playerScoreLable.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,18));
+        Label computerScoreLable = new Label("Computer Score: 0");
+        computerScoreLable.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,18));
+        Label Resultlable = new Label("");
+        Resultlable.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,14));
         
-        // create game scene
-        HBox gamePane = new HBox(20);
-        gamePane.setAlignment(Pos.CENTER);
-        playerChoiceImageView = new ImageView();
-        computerChoiceImageView = new ImageView();
-        VBox scorePane = new VBox(20);
-        scorePane.setAlignment(Pos.CENTER);
-        playerScoreLabel = new Label("Player: 0");
-        playerScoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        computerScoreLabel = new Label("Computer: 0");
-        computerScoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        messageLabel = new Label("");
-        messageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        scorePane.getChildren().addAll(playerScoreLabel, computerScoreLabel, messageLabel);
-        gamePane.getChildren().addAll(playerChoiceImageView, scorePane, computerChoiceImageView);
-        gamePane.setPrefSize(GAME_PANE_WIDTH, GAME_PANE_HEIGHT);
-        Button rockButton = new Button("Rock");
-        rockButton.setOnAction(e -> playGame(0));
-        Button paperButton = new Button("Paper");
-        paperButton.setOnAction(e -> playGame(1));
-        Button scissorsButton = new Button("Scissors");
-        scissorsButton.setOnAction(e -> playGame(2));
-        HBox buttonPane = new HBox(20);
-        buttonPane.setAlignment(Pos.CENTER);
-        buttonPane.getChildren().addAll(rockButton, paperButton, scissorsButton);
 
-        VBox gameScenePane = new VBox(20);
-        gameScenePane.setAlignment(Pos.CENTER);
-        Pane gameSceneBackground = new Pane(gamePane);
-        gameScenePane.getChildren().addAll(gameSceneBackground, buttonPane);
-        gameScene = new Scene(gameScenePane, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        // create end scene
-        VBox endPane = new VBox(20);
-        endPane.setAlignment(Pos.CENTER);
-        Label endTitleLabel = new Label("Game Over");
-        endTitleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 36));
-        Label endMessageLabel = new Label();
-        endMessageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        Button playAgainButton = new Button("Play Again");
-        playAgainButton.setOnAction(e -> {
-            playerScore = 0;
-            computerScore = 0;
-            updateGameScene();
-            primaryStage.setScene(gameScene);
+        
+        Button btnRock = new Button("Rock");
+        btnRock.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,14));
+        Button btnPaper = new Button("Paper");
+        btnPaper.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,14));
+        Button btnScissors = new Button("Scissors");
+        btnScissors.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,14));
+        
+        //Choices Button
+        btnRock.setOnAction(e -> {
+            playRound("rock", Resultlable);
+            updateScores(playerScoreLable, computerScoreLable);
+            checkWinCondition(primaryStage);
         });
-        Button quitButton = new Button("Quit");
-        quitButton.setOnAction(e -> primaryStage.close());
-        HBox endButtonPane = new HBox(20);
-        endButtonPane.setAlignment(Pos.CENTER);
-        endButtonPane.getChildren().addAll(playAgainButton, quitButton);
-        endPane.getChildren().addAll(endTitleLabel, endMessageLabel, endButtonPane);
-        endScene = new Scene(endPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        primaryStage.setScene(startScene);
+
+        btnPaper.setOnAction(e -> {
+            playRound("paper", Resultlable);
+            updateScores(playerScoreLable, computerScoreLable);
+            checkWinCondition(primaryStage);
+        });
+
+
+        btnScissors.setOnAction(e -> {
+            playRound("scissors", Resultlable);
+            updateScores(playerScoreLable, computerScoreLable);
+            checkWinCondition(primaryStage);
+        });
+        
+      
+        // Layout
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.add(btnRock, 0, 0);
+        gridPane.add(btnPaper, 1, 0);
+        gridPane.add(btnScissors, 2, 0);
+
+
+        VBox vBox = new VBox(20);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.getChildren().addAll(titleLable, playerScoreLable, computerScoreLable, gridPane, Resultlable);
+
+        //Scene setting (vBox, weight,height)
+        
+        Scene gameScene = new Scene(vBox, 500, 400); 
+        primaryStage.setTitle("First Come First Win");
+        primaryStage.setScene(gameScene);
         primaryStage.show();
     }
-    public static void main(String[] args) {
-        launch(args);
-    }
-    private void playGame(int playerChoice) {
-        int computerChoice = random.nextInt(choices.length);
-        Image playerChoiceImage = new Image(getClass().getResourceAsStream(choices[playerChoice] + ".png"));
-        playerChoiceImageView.setImage(playerChoiceImage);
-        Image computerChoiceImage = new Image(getClass().getResourceAsStream(choices[computerChoice] + ".png"));
-        computerChoiceImageView.setImage(computerChoiceImage);
-        if (playerChoice == computerChoice) {
-            messageLabel.setText("Tie!");
-        } else if ((playerChoice == 0 && computerChoice == 2) ||
-                (playerChoice == 1 && computerChoice == 0) ||
-                (playerChoice == 2 && computerChoice == 1)) {
+
+    //Game logic
+	private void playRound(String playerChoice, Label lblResult) {
+        String computerChoice = getComputerChoice();
+        String result;
+
+        if (playerChoice.equals(computerChoice)) {
+            result = "Tie!";
+        } else if ((playerChoice.equals("rock") && computerChoice.equals("scissors"))
+                || (playerChoice.equals("paper") && computerChoice.equals("rock"))
+                || (playerChoice.equals("scissors") && computerChoice.equals("paper"))) {
+            result = "You win!";
             playerScore++;
-            playerScoreLabel.setText("Player: " + playerScore);
-            messageLabel.setText("Player wins!");
         } else {
+            result = "Computer wins!";
             computerScore++;
-            computerScoreLabel.setText("Computer: " + computerScore);
-            messageLabel.setText("Computer wins!");
         }
-        if (playerScore == maxScore || computerScore == maxScore) {
-            String winner = playerScore == maxScore ? "Player" : "Computer";
-            Label endMessageLabel = (Label) endScene.lookup("#endMessageLabel");
-            endMessageLabel.setText(winner + " wins the game!");
-            primaryStage.setScene(endScene);
+
+        lblResult.setText("You chose " + playerChoice + ", computer chose " + computerChoice + ". " + result);
+    }
+
+
+    private String getComputerChoice() {
+        int choice = (int) (Math.random() * 3);
+
+        if (choice == 0) {
+            return "rock";
+        } else if (choice == 1) {
+            return "paper";
+        } else {
+            return "scissors";
         }
     }
 
-    private void updateGameScene() {
-        playerChoiceImageView.setImage(null);
-        computerChoiceImageView.setImage(null);
-        playerScoreLabel.setText("Player: 0");
-        computerScoreLabel.setText("Computer: 0");
-        messageLabel.setText("");
+
+    private void updateScores(Label lblPlayerScore, Label lblComputerScore) {
+        lblPlayerScore.setText("Player Score: " + playerScore);
+        lblComputerScore.setText("Computer Score: " + computerScore);
     }
-    public class GameScene {
-        private Scene scene;
-        private Label resultLabel;
-        private ImageView playerImage;
-        private ImageView computerImage;
-        private Button rockButton;
-        private Button paperButton;
-        private Button scissorsButton;
-        private int playerScore = 0;
-        private int computerScore = 0;
-        private int winningScore = 3;
 
-        public GameScene() {
-            // create images
-            Image rockImage = new Image(getClass().getResourceAsStream("rock.png"));
-            Image paperImage = new Image(getClass().getResourceAsStream("paper.png"));
-            Image scissorsImage = new Image(getClass().getResourceAsStream("scissors.png"));
-            playerImage = new ImageView();
-            computerImage = new ImageView();
-            playerImage.setFitWidth(200);
-            playerImage.setFitHeight(200);
-            computerImage.setFitWidth(200);
-            computerImage.setFitHeight(200);
-            playerImage.setImage(rockImage);
-            computerImage.setImage(rockImage);
 
-            // create buttons
-            rockButton = new Button("Rock");
-            paperButton = new Button("Paper");
-            scissorsButton = new Button("Scissors");
-            rockButton.setOnAction(e -> play(PlayerSelection.ROCK));
-            paperButton.setOnAction(e -> play(PlayerSelection.PAPER));
-            scissorsButton.setOnAction(e -> play(PlayerSelection.SCISSORS));
-
-            // create result label
-            resultLabel = new Label("Choose your move to start playing.");
-
-            // create layout
-            VBox layout = new VBox(20);
-            layout.setAlignment(Pos.CENTER);
-            layout.getChildren().addAll(playerImage, computerImage, new HBox(20, rockButton, paperButton, scissorsButton), resultLabel);
-            scene = new Scene(layout, 600, 600);
-
-            // start the game
-            play(PlayerSelection.ROCK);
+    private void checkWinCondition(Stage endScene) {
+        if (playerScore >= roundsToWin) {
+        endGame(endScene, "You win!");
+        } else if (computerScore >= roundsToWin) {
+        endGame(endScene, "Computer wins!");
         }
-
-        public Scene getScene() {
-            return scene;
         }
-
-        private void play(PlayerSelection playerSelection) {
-            // generate computer selection
-            ComputerSelection computerSelection = ComputerSelection.getRandomSelection();
-
-            // update images
-            playerImage.setImage(playerSelection.getImage());
-            computerImage.setImage(computerSelection.getImage());
-
-            // determine winner
-            Result result = playerSelection.getResult(computerSelection);
-
-            // update scores and result label
-            if (result == Result.WIN) {
-                playerScore++;
-            } else if (result == Result.LOSE) {
-                computerScore++;
-            }
-            resultLabel.setText("Player: " + playerScore + "   Computer: " + computerScore + "\n" + result.toString());
-
-            // check for winner
-            if (playerScore >= winningScore) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Game Over");
-                alert.setHeaderText(null);
-                alert.setContentText("Congratulations! You win!");
-                alert.showAndWait();
-                reset();
-            } else if (computerScore >= winningScore) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Game Over");
-                alert.setHeaderText(null);
-                alert.setContentText("Sorry, you lost. Better luck next time!");
-                alert.showAndWait();
-                reset();
-            }
-        }
-
-        private void reset() {
-            playerScore = 0;
-            computerScore = 0;
-            playerImage.setImage(new Image(getClass().getResourceAsStream("rock.png")));
-            computerImage.setImage(new Image(getClass().getResourceAsStream("rock.png")));
-            resultLabel.setText("Choose your move to start playing.");
-        }
-
     
-}
-}
+	private void endGame(Stage primaryStage, String result) {
+		Label lblResult = new Label(result);
+		lblResult.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,15));
+		
+
+		Button btnNewGame = new Button("New Game");
+		btnNewGame.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,12));
+		btnNewGame.setOnAction(e -> {
+			playerScore = 0;
+			computerScore = 0;
+			lblResult.setText("");
+			primaryStage.setScene(gameScene); //not jet fix: to return gameScene
+			
+	});
+		
+		Button btnExitGame = new Button("Exit");
+		btnExitGame.setFont(Font.font("Comic Sans MS", FontWeight.BOLD,12));
+		btnExitGame.setOnAction(e -> {
+			primaryStage.close();
+		});
+	
+		
+		HBox hBox1 = new HBox(20);
+		hBox1.setAlignment(Pos.CENTER);
+		hBox1.getChildren().addAll(btnNewGame, btnExitGame);
+		
+		VBox vBox = new VBox(20);
+		vBox.setAlignment(Pos.CENTER);
+		vBox.getChildren().addAll(lblResult, hBox1);
+       
+		Scene endScene = new Scene(vBox, 500, 200);
+		primaryStage.setScene(endScene);
+	}
+       
+        public static void main(String[] args) {
+            launch(args);
+        }
+       
+    }
 
 
